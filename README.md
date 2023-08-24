@@ -1,4 +1,5 @@
 # computing_tutorial
+This repo is an informal computational workflow and productivity tutorial that was presented at the University of Washington.
 
 Slide available at: [BruntonLab Meeting 08/24/23](https://docs.google.com/presentation/d/1Hz9PwWblYLvo1TFiZbOrGMarjNNcP17WNFkGSrxVUgM/edit?usp=sharing)
 
