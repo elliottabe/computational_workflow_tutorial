@@ -1,7 +1,9 @@
 # computing_tutorial
 This repo is an informal computational workflow and productivity tutorial that was presented at the University of Washington.
 
-Slide available at: [BruntonLab Meeting 08/24/23](https://docs.google.com/presentation/d/1Hz9PwWblYLvo1TFiZbOrGMarjNNcP17WNFkGSrxVUgM/edit?usp=sharing)
+New Slides: [BruntonLab Meeting 10/24/24](https://docs.google.com/presentation/d/1kFcNG5XiSY-921iss_0cMdkErg0jRxFenHg9DAx4Bsk/edit?usp=sharing)
+
+Old Slide available at: [BruntonLab Meeting 08/24/23](https://docs.google.com/presentation/d/1Hz9PwWblYLvo1TFiZbOrGMarjNNcP17WNFkGSrxVUgM/edit?usp=sharing)
 
 # Typical setup for installing conda environment and dependencies
 
