@@ -1,0 +1,45 @@
+# Dataset name - used to pick the data to load
+dataset_name: ${dataset.name}
+
+##### Easy Access Variables #####
+# if set to positive integer, overrides the default
+version: ''
+seed: 42
+num_gpus: ''
+run_id: ''
+load_jobid: ''
+
+
+# set default task and default training config based on dataset
+defaults:
+  - _self_
+  - dataset: mlp
+  - train: train_mlp
+  - paths: hyak
+  # - override hydra/launcher: joblib
+  # - hydra/job_logging: disabled
+
+
+# set the directory where the output files get saved
+hydra:
+  job:
+      config:
+        override_dirname:
+          exclude_keys:
+            - paths
+            - version
+            - dataset
+            - dataset.train.gpu
+            - checkpoint
+            - gpu
+            - train
+            - train.note
+            - num_gpus
+            - train.num_envs
+            - load_jobid
+
+  run:
+    dir: ${paths.base_dir}/${hydra:job.override_dirname}
+  sweep:
+    dir: ${paths.base_dir}
+    subdir: ${hydra.job.override_dirname}

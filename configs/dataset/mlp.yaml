@@ -1,0 +1,7 @@
+##### Task #####
+task: CompWorkflow
+
+##### Model parameters #####
+batch_size: 24576
+lr: 0.001
+

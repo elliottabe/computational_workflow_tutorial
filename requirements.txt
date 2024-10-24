@@ -2,4 +2,4 @@ opencv-python
 scikit-learn
 test_tube
 mdutils
-hydra-core>=1.2.0
+hydra-core

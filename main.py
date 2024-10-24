@@ -13,50 +13,19 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
+import hydra
+from omegaconf import DictConfig, OmegaConf
 
-def arg_parser(jupyter=False):
-    parser = argparse.ArgumentParser(description=__doc__)
-    ##### Directory Parameters #####
-    parser.add_argument('--save_dir',           type=str, default='./runs/')
-    parser.add_argument('--dataset_type',       type=str, default='FashionMNIST')
-    ##### Simulation Parameters ##### 
-    parser.add_argument('--gpu',                type=int, default= 0)
-    parser.add_argument('--version',            type=str, default='testing')
-    parser.add_argument('--generate_report',    type=s2b, default=True)
-    ##### Model Paremeters #####       
+@hydra.main(version_base=None, config_path="configs", config_name="config")
+def main(cfg: DictConfig) -> None:
     
-    if jupyter:
-        args = parser.parse_args('')
-    else:
-        args = parser.parse_args()
-    return vars(args)
-
-
-if __name__ == '__main__':
-    
-    args = arg_parser()
-    save_dir = Path(args['save_dir'])
-    save_dir.mkdir(parents=True, exist_ok=True)
-    data_dir = Path('./data/{}/raw/'.format(args['dataset_type']))
-    exp_dir_name = args['dataset_type']
-    ModelID = 'Testing_{}'.format(args['dataset_type'])
-    version = args['version']
-
-
-    exp = Experiment(name='{}'.format(ModelID),
-                        save_dir=save_dir / exp_dir_name, 
-                        debug=False,
-                        version=version)
-
-    save_model = exp.save_dir / exp.name / 'version_{}/media'.format(version)
-    fig_path = exp.save_dir / exp.name / 'version_{}/figures'.format(version)
-    fig_path.mkdir(parents=True, exist_ok=True)
-
-    config_path = Path('./conf/config.yaml')
-    config = OmegaConf.load(config_path)
-    config.args = {'dataset_type': args['dataset_type'], 'version': version, 'save_dir': save_dir, }
-    print(OmegaConf.to_yaml(config))
-
+    # Create paths if they don't exist and Path objects
+    for k in cfg.paths.keys():
+        if k != "user":
+            cfg.paths[k] = Path(cfg.paths[k])
+            cfg.paths[k].mkdir(parents=True, exist_ok=True)
+    print(OmegaConf.to_yaml(cfg))
+    save_model = cfg.paths.ckpt_dir
     # Download training data from open datasets.
     training_data = datasets.FashionMNIST(
         root="data",
@@ -73,8 +42,8 @@ if __name__ == '__main__':
         transform=ToTensor(),
     )
     # Create data loaders.
-    train_dataloader = DataLoader(training_data, batch_size=config.model.batch_size)
-    test_dataloader = DataLoader(test_data, batch_size=config.model.batch_size)
+    train_dataloader = DataLoader(training_data, batch_size=cfg.dataset.batch_size)
+    test_dataloader = DataLoader(test_data, batch_size=cfg.dataset.batch_size)
 
     for X, y in test_dataloader:
         print(f"Shape of X [N, C, H, W]: {X.shape}")
@@ -99,13 +68,13 @@ if __name__ == '__main__':
 
     # Define loss function and Optimizer
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=config.model.lr)
+    optimizer = torch.optim.SGD(model.parameters(), lr=cfg.dataset.lr)
 
     ##### Save config at start #####
-    OmegaConf.save(config, save_model.parent / 'config.yaml')
+    OmegaConf.save(config=cfg, f=cfg.paths.log_dir / 'run_config.yaml')
 
     # Train and test the model
-    for t in range(config.train.num_epochs):
+    for t in range(cfg.train.num_epochs):
         print(f"Epoch {t+1}\n-------------------------------")
         train(train_dataloader, model, loss_fn, optimizer, device)
         test(test_dataloader, model, loss_fn, device)
@@ -113,13 +82,18 @@ if __name__ == '__main__':
     ##### Save model #####
     torch.save(model.state_dict(), save_model / 'model.pth')
     print(f"Saved PyTorch Model State to {save_model / 'model.pth'}")
-    config.train.checkpoint = save_model / 'model.pth'
-    OmegaConf.save(config=config, f=save_model.parent / 'config.yaml')
+    cfg.train.checkpoint = save_model / 'model.pth'
+    ##### Save at the end ##### 
+    OmegaConf.save(config=cfg, f=cfg.paths.log_dir / 'run_config.yaml')
     print("Done!")
 
-    if args['generate_report']:
+    if cfg.datsaset['generate_report']:
         RepoPath = Path('./').resolve()
         Wiki_Path = RepoPath.parent / 'computing_tutorial.wiki'
 
-        plot_figures(config,fig_path.absolute(),save_figs=True)
-        generate_report(Wiki_Path,fig_path,config,version)
+        plot_figures(cfg,cfg.paths.fig_dir.absolute(),save_figs=True)
+        generate_report(Wiki_Path,cfg.paths.fig_dir,cfg,cfg.version)
+    
+    
+if __name__ == '__main__':
+    main()

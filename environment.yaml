@@ -1,18 +1,19 @@
 name: comp_workflow
 channels:
+  - conda-forge
   - defaults
 dependencies:
-  - python >=3.10,<3.11
-  - defaults::scipy
-  - defaults::numpy
-  - defaults::pandas
-  - defaults::matplotlib
-  - defaults::ipykernel
-  - defaults::tqdm
-  - defaults::h5py
-  - defaults::pytables
-  - defaults::seaborn
-  - defaults::ipywidgets
-  - defaults::jupyter
-  - defaults::jupyterlab
+  - python=3.11
+  - scipy
+  - numpy
+  - pandas
+  - matplotlib
+  - ipykernel
+  - tqdm
+  - h5py
+  - pytables
+  - seaborn
+  - ipywidgets
+  - jupyter
+  - jupyterlab
   - pip
